@@ -1,3 +1,5 @@
+![Banner](banner.png)
+
 ## Low-Event-Diffing
 
 Low-Event-Diffing is a cybersecurity tool designed to compare application-related events and logs across hosts, identifying anomalous differences.
