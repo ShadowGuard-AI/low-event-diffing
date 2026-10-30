@@ -13,30 +13,31 @@ Low-Event-Diffing is a cybersecurity tool designed to compare application-relate
 ### Usage
 
 ```
-python main.py [options]
+python main.py -f1 FILE1 -f2 FILE2 [-o OUTPUT]
 
 Options:
   -h, --help            show this help message and exit
-  --host HOST           Host to analyze (default: localhost)
-  --port PORT           Port to analyze (default: 22)
-  --username USERNAME   Username to use for SSH connection (default: root)
-  --password PASSWORD   Password to use for SSH connection
-  --keyfile KEYFILE     Path to SSH private key file
-  --log-file LOG_FILE   Path to log file
-  --verbose             Enable verbose output
+  -f1 FILE1, --file1 FILE1
+                        Path to the first log/event file.
+  -f2 FILE2, --file2 FILE2
+                        Path to the second log/event file.
+  -o OUTPUT, --output OUTPUT
+                        Path to save the diff results.
+  -v, --version         Show tool version.
 ```
+
+The tool compares two local log or event files and prints a unified diff of the anomalous differences. It does not connect to a remote host.
 
 **Example:**
 
 ```
-python main.py --host 192.168.1.100 --port 22 --username user --password password --log-file /tmp/logs.txt
+python main.py -f1 host1-events.txt -f2 host2-events.txt -o diff-output.txt
 ```
 
 ### Security Warnings and Considerations
 
-* Ensure that the host you are analyzing is trusted and authorized for remote access.
-* Use strong passwords or SSH keys to secure the remote connection.
-* Review the log file carefully for any suspicious or anomalous activity.
+* Review the diff output carefully for any suspicious or anomalous activity.
+* Only compare log or event files you are authorized to inspect.
 
 ### License
 
