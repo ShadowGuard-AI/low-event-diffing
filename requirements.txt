@@ -1,1 +1,1 @@
-pwn>=0.5.5
+# Standard library only. No third-party packages are required.

@@ -1,6 +1,7 @@
 import argparse
 import logging
-from pwn import *
+import os
+import sys
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -47,7 +48,7 @@ def diff_events(file1, file2):
 
         # Use difflib for a simple comparison
         from difflib import unified_diff
-        differences = list(unified_diff(events1, events2, lineterm=''))
+        differences = list(unified_diff(events1, events2, fromfile=file1, tofile=file2, lineterm=''))
         return differences
     except FileNotFoundError as e:
         logging.error(f"File not found: {e}")
@@ -65,22 +66,38 @@ def main():
 
     logging.info("Starting low-Event-Diffing tool...")
 
+    if args.output:
+        resolved_output = os.path.realpath(args.output)
+        if resolved_output in (os.path.realpath(args.file1), os.path.realpath(args.file2)):
+            logging.error(f"Output path {args.output} resolves to an input file. Refusing to overwrite an input.")
+            sys.exit(1)
+
     try:
         differences = diff_events(args.file1, args.file2)
 
         if differences:
+            # Diff lines from the files already end with newlines, so strip
+            # them before joining or every content line gains a blank line.
+            normalized = [line.rstrip('\n') for line in differences]
             logging.info("Differences found:")
-            for line in differences:
+            for line in normalized:
                 print(line)
 
             if args.output:
                 with open(args.output, 'w') as outfile:
-                    outfile.writelines("\n".join(differences))
+                    outfile.write("\n".join(normalized) + "\n")
                 logging.info(f"Differences saved to {args.output}")
         else:
             logging.info("No differences found between the files.")
+            if args.output:
+                with open(args.output, 'w') as outfile:
+                    outfile.write("No differences found between the files.\n")
+                logging.info(f"No differences found. That result was saved to {args.output}")
+    except SystemExit:
+        raise
     except Exception as e:
         logging.error(f"An error occurred during execution: {e}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

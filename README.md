@@ -8,7 +8,7 @@ Low-Event-Diffing is a cybersecurity tool designed to compare application-relate
 
 1. Clone the repository: `git clone https://github.com/ShadowStrikeHQ/low-Event-Diffing.git`
 2. Change directory: `cd low-Event-Diffing`
-3. Install requirements: `pip install -r requirements.txt`
+3. No install step is needed beyond the clone: the tool uses only the Python standard library.
 
 ### Usage
 
@@ -27,6 +27,8 @@ Options:
 ```
 
 The tool compares two local log or event files and prints a unified diff of the anomalous differences. It does not connect to a remote host.
+
+The saved diff names both input files in its headers. When `-o` is given, the output file is always written: if the files match, it holds a single line saying no differences were found. An output path that resolves to either input file, including through a symlink, is refused at exit 1, and a run that cannot read an input exits 1.
 
 **Example:**
 
