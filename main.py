@@ -48,6 +48,12 @@ def diff_events(file1, file2):
 
         # Use difflib for a simple comparison
         from difflib import unified_diff
+        # unified_diff with its default three lines of context. lineterm is
+        # emptied because the content lines already carry their own newlines;
+        # the header lines the generator adds would otherwise be the only ones
+        # without. Nothing here sorts or normalises the events first, so the
+        # same events in a different order diff as changes, and timestamps
+        # make near identical logs differ on every line that carries one.
         differences = list(unified_diff(events1, events2, fromfile=file1, tofile=file2, lineterm=''))
         return differences
     except FileNotFoundError as e:
@@ -75,6 +81,10 @@ def main():
     try:
         differences = diff_events(args.file1, args.file2)
 
+        # Differences do not change the exit code. A run that finds a hundred
+        # differing lines and a run that finds none both exit 0; only a file
+        # that cannot be read exits 1, through the handler below. A script
+        # gating on this tool has to read its output, not its status.
         if differences:
             # Diff lines from the files already end with newlines, so strip
             # them before joining or every content line gains a blank line.
@@ -91,6 +101,9 @@ def main():
             logging.info("No differences found between the files.")
             if args.output:
                 with open(args.output, 'w') as outfile:
+                    # The no-difference sentence is written into the output file as its
+                    # whole content, so a saved result is never an empty file that a
+                    # reader could mistake for a run that produced nothing.
                     outfile.write("No differences found between the files.\n")
                 logging.info(f"No differences found. That result was saved to {args.output}")
     except SystemExit:
